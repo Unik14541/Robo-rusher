@@ -7,6 +7,9 @@ public class InfinityPlatform : Platformsspawner
 {
     Transform playerTransform;
     List<GameObject> activePlatform = new List<GameObject>();
+    [SerializeField] int maxCountToSpawn;
+    [SerializeField] Platform bustPlatform;
+    int curCountToSpawnBust;
 
     private void Start() {
         playerTransform = FindObjectOfType<Playermove>().transform;
@@ -24,9 +27,32 @@ public class InfinityPlatform : Platformsspawner
         Destroy(LostPlatform);
     }
     private void Update() {
-        if(playerTransform.position.z > spawnDirection - (maxPlatformCount * platformLength)) {
-            SpawnPlatform(GetRandomPlatform());
+        if (playerTransform.position.z > spawnDirection - (maxPlatformCount * platformLength)) {
+          for(int i = 0; i < maxPlatformCount; i++) {
+            if(curCountToSpawnBust == maxCountToSpawn){
+                SpawnPlatform(bustPlatform);
+                curCountToSpawnBust = 0;
+            }
+            else{
+                SpawnPlatform(GetRandomPlatform());
+                curCountToSpawnBust++;
+            }
             RemoveActivePlatform();
+          }
         }
+    }
+    protected override void GenerateStart()
+    {
+        SpawnPlatform(startPlatform);
+        for(int i = 0; i < maxPlatformCount; i++) {
+            if(curCountToSpawnBust == maxCountToSpawn){
+                SpawnPlatform(bustPlatform);
+                curCountToSpawnBust = 0;
+            }
+            else{
+                SpawnPlatform(GetRandomPlatform());
+                curCountToSpawnBust++;
+            }
+          }
     }
 }
